@@ -1,16 +1,30 @@
 from flask import Flask, g
+from flask_login import LoginManager
 
 import models
 
 from api.api import api
-
+from api.user import user
 
 DEBUG = True
 PORT = 8000
 
+login_manager = LoginManager()
+
+
 app = Flask(__name__)
+app.secret_key = "LJAKLJLKJJLJKLSDJLKJASD"
+login_manager.init_app(app)
+
+@login_manager.user_loader
+def load_user(userid):
+    try:
+        return models.User.get(models.User.id == userid)
+    except models.DoesNotExist:
+        return None
 
 app.register_blueprint(api)
+app.register_blueprint(user)
 
 @app.before_request
 def before_request():
