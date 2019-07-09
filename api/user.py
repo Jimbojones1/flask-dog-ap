@@ -11,7 +11,7 @@ from playhouse.shortcuts import model_to_dict
 user = Blueprint('users', 'user', url_prefix='/user')
 
 @user.route('/', methods=["POST"])
-def create_user():
+def register():
     ## see request payload anagolous to req.body in express
     payload = request.get_json()
     payload['password'] = generate_password_hash(payload['password'])
@@ -19,18 +19,11 @@ def create_user():
 
     #login_user
     login_user(user)
-    ## see the object
-    print(current_user, ' currentUser')
+    ## convert class Model to class dict
     user_dict = model_to_dict(user)
     print(user_dict)
-    print(user.__dict__)
     print(type(user_dict))
-    print(user)
     # delete the password
     del user_dict['password']
-    ## Look at all the methods
-    # print(dir(user))
-    # Change the model to a dict
-    # print(model_to_dict(user), 'model to dict')
-    # return jsonify(message='working')
+
     return jsonify(user_dict)
