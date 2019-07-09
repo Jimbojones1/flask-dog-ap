@@ -32,7 +32,7 @@ def register():
         # delete the password
         del user_dict['password']
 
-        return jsonify(data=user_dict)
+        return jsonify(data=user_dict, status=201)
 
 @user.route('/login', methods=["POST"])
 def login():
@@ -44,11 +44,11 @@ def login():
         if(check_password_hash(user_dict['password'], payload['password'])):
             del user_dict['password']
             print(user, ' this is user')
-            return jsonify(data=user_dict)
+            return jsonify(data=user_dict, status=200)
         else:
-            return jsonify(data="Username or password does not Exist")
+            return jsonify(data="Username or password does not Exist", status=200)
     except models.DoesNotExist:
-        return jsonify(data="Username or password does not Exist")
+        return jsonify(data="Username or password does not Exist", status=200)
 
 
 @user.route('/profile/<id>', methods=['GET'])
@@ -59,7 +59,7 @@ def profile(id):
         del user_dict['password']
         return jsonify(data=user_dict)
     except models.DoesNotExist:
-        return jsonify(data="User does not exist")
+        return jsonify(data="User does not exist", status=200)
 
 
 

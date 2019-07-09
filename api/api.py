@@ -14,7 +14,7 @@ def get_all_dogs():
     ## find the dogs and change each one to a dictionary into a new array
     dogs = [model_to_dict(dog) for dog in models.Dog.select()]
     print(dogs)
-    return jsonify(dogs)
+    return jsonify(data=dogs, status=200)
 
 
 @api.route('/', methods=["POST"])
@@ -29,28 +29,28 @@ def create_dogs():
     print(dir(dog))
     # Change the model to a dict
     print(model_to_dict(dog), 'model to dict')
-
-    return jsonify(model_to_dict(dog))
+    dog_dict = model_to_dict(dog)
+    return jsonify(data=dog_dict, status=201)
 
 @api.route('/<id>', methods=["GET"])
 def get_one_dog(id):
     print(id, 'reserved word?')
     dog = models.Dog.get_by_id(id)
     print(dog.__dict__)
-    return jsonify(model_to_dict(dog))
+    return jsonify(data=model_to_dict(dog), status=200)
 
 @api.route('/<id>', methods=["PUT"])
 def update_dog(id):
     payload = request.get_json()
     query = models.Dog.update(**payload).where(models.Dog.id==id)
     query.execute()
-    return jsonify(model_to_dict(models.Dog.get_by_id(id)))
+    return jsonify(data=model_to_dict(models.Dog.get_by_id(id)), status=200)
 
 @api.route('/<id>', methods=["Delete"])
 def delete_dog(id):
     query = models.Dog.delete().where(models.Dog.id==id)
     query.execute()
-    return jsonify(message='resource successfully deleted')
+    return jsonify(data='resource successfully deleted', status=200)
 
 
 
