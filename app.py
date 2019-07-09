@@ -1,6 +1,6 @@
 from flask import Flask, g
 from flask_login import LoginManager
-
+from flask_cors import CORS
 import models
 
 from api.api import api
@@ -23,6 +23,8 @@ def load_user(userid):
     except models.DoesNotExist:
         return None
 
+CORS(api, origins=['http://localhost:3000'], supports_credentials=True)
+CORS(user, origins=['http://localhost:3000'], supports_credentials=True)
 app.register_blueprint(api)
 app.register_blueprint(user)
 
