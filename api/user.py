@@ -51,7 +51,15 @@ def login():
         return jsonify(data="Username or password does not Exist")
 
 
-
+@user.route('/profile/<id>', methods=['GET'])
+def profile(id):
+    try:
+        user = models.User.get(models.User.id == id)
+        user_dict = model_to_dict(user)
+        del user_dict['password']
+        return jsonify(data=user_dict)
+    except models.DoesNotExist:
+        return jsonify(data="User does not exist")
 
 
 
