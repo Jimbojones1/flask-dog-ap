@@ -1,5 +1,9 @@
 import models
 
+import os
+import sys
+import secrets
+
 from flask import Blueprint, request, jsonify
 from flask_bcrypt import generate_password_hash, check_password_hash
 from flask_login import login_user, current_user
@@ -10,29 +14,51 @@ from playhouse.shortcuts import model_to_dict
 # to prefix all our apis with /api/v1
 user = Blueprint('users', 'user', url_prefix='/user')
 
+def save_picture(form_picture):
+    random_hex = secrets.token_hex(8)
+    # won't use f_name
+    f_name, f_ext = os.path.splitext(form_picture.filename)
+    picture_fn = random_hex + f_ext
+    file_path_for_avatar = os.path.join(os.getcwd(), 'static/profile_pics/' + picture_fn)
+
+    form_picture.save(file_path_for_avatar)
+
+    # picture_path = os.path.join(app.root_path, 'static/profile_pics', picture_fn )
+
 @user.route('/register', methods=["POST"])
 def register():
     ## see request payload anagolous to req.body in express
-    payload = request.get_json()
-    payload['email'].lower()
-    try:
-        # Find if the user already exists?
-        models.User.get(models.User.email == payload['email'])
-        return jsonify(body='User with that email already exists? Choose another or Login')
-    except models.DoesNotExist:
-        payload['password'] = generate_password_hash(payload['password'])
-        user = models.User.create(**payload)
+    payload = request.files
 
-        #login_user
-        login_user(user)
-        ## convert class Model to class dict
-        user_dict = model_to_dict(user)
-        print(user_dict)
-        print(type(user_dict))
-        # delete the password
-        del user_dict['password']
+    pay = request.form.to_dict()
 
-        return jsonify(data=user_dict, status=201)
+    dict_payload = payload.to_dict()
+    print(payload, ' this is <-- payload')
+    print(type(dict_payload['file']))
+    print(pay['username'], ' this is pay?')
+    print(pay)
+    save_picture(dict_payload['file'])
+
+    # payload['email'].lower()
+    # try:
+    #     # Find if the user already exists?
+    #     models.User.get(models.User.email == payload['email'])
+    #     return jsonify(body='User with that email already exists? Choose another or Login')
+    # except models.DoesNotExist:
+    #     payload['password'] = generate_password_hash(payload['password'])
+    #     user = models.User.create(**payload)
+
+    #     #login_user
+    #     login_user(user)
+    #     ## convert class Model to class dict
+    #     user_dict = model_to_dict(user)
+    #     print(user_dict)
+    #     print(type(user_dict))
+    #     # delete the password
+    #     del user_dict['password']
+
+    #     return jsonify(data=user_dict, status=201)
+    return jsonify(message='working')
 
 @user.route('/login', methods=["POST"])
 def login():
