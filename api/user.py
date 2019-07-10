@@ -4,6 +4,7 @@ import os
 import sys
 import secrets
 
+from PIL import Image
 from flask import Blueprint, request, jsonify, url_for, send_file
 from flask_bcrypt import generate_password_hash, check_password_hash
 from flask_login import login_user, current_user
@@ -21,7 +22,11 @@ def save_picture(form_picture):
     picture_fn = random_hex + f_ext
     file_path_for_avatar = os.path.join(os.getcwd(), 'static/profile_pics/' + picture_fn)
 
-    form_picture.save(file_path_for_avatar)
+    output_size = (125, 175)
+    i = Image.open(form_picture)
+    i.thumbnail(output_size)
+    i.rotate(30)
+    i.save(file_path_for_avatar)
 
     return picture_fn
     # picture_path = os.path.join(app.root_path, 'static/profile_pics', picture_fn )
@@ -87,17 +92,10 @@ def profile(id):
         del user_dict['password']
         return jsonify(data=user_dict, status={"code": 200, "message": "success"})
     except models.DoesNotExist:
-        return jsonify(data={}, status={"code": 401, "message": "Username or Password is incorrect"})
+        return jsonify(data={}, status={"code": 401, "message": "User does Not Exist"})
 
 
-@user.route('/avatar/<filepath>', methods=['GET'])
-def return_profile_avatar(filepath):
-    print(filepath, ' < this is file path')
-    # # image_file = url_for('static', filename='profile_pics/' + filepath)
-    # print(image_file)
-    print(os.getcwd())
-    image_file = os.path.join('profile_pics/' + filepath)
-    return jsonify(data=image_file)
+
 
 
 
